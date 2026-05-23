@@ -1,0 +1,545 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Para mi Peshosa | 1 Año Juntos</title>
+
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Dancing+Script:wght@600&family=Playfair+Display:ital,wght@0,600;0,700;1,400&display=swap" rel="stylesheet">
+
+    <style>
+        /* ==========================================================================
+           VARIABLES DE DISEÑO Y TEMATIZACIÓN
+           ========================================================================== */
+        :root {
+            --cream: #FAF6F0;
+            --wine: #420202;
+            --wine-light: #7D1212;
+            --gold: #C5A059;
+            --ink: #261C1C;
+            --paper: #FCFBF9;
+
+            /* Curvas de animación personalizadas (Física fluida) */
+            --cue-reveal: cubic-bezier(0.25, 1, 0.3, 1);
+            --cue-bounce: cubic-bezier(0.34, 1.56, 0.64, 1);
+            --cue-sheet: cubic-bezier(0.76, 0, 0.24, 1);
+        }
+
+        /* ==========================================================================
+           RESET Y CONFIGURACIÓN ESTRUCTURAL
+           ========================================================================== */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            background-color: var(--cream);
+            color: var(--wine);
+            font-family: 'Playfair Display', serif;
+            height: 100vh;
+            width: 100vw;
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            position: relative;
+            perspective: 1000px;
+        }
+
+        /* Textura orgánica de grano de película antiguo */
+        body::before {
+            content: '';
+            position: fixed;
+            inset: 0;
+            z-index: 999;
+            pointer-events: none;
+            opacity: 0.035;
+            background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.8' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)'/%3E%3C/svg%3E");
+        }
+
+        /* Viñeta cinematográfica para enfocar la iluminación central */
+        .vignette {
+            position: fixed;
+            inset: 0;
+            background: radial-gradient(circle at center, transparent 20%, rgba(38, 28, 28, 0.25) 100%);
+            z-index: 2;
+            pointer-events: none;
+        }
+
+        canvas {
+            position: fixed;
+            inset: 0;
+            z-index: 1;
+            pointer-events: none;
+        }
+
+        /* ==========================================================================
+           INTERFAZ EDITORIAL (HEADER)
+           ========================================================================== */
+        header {
+            text-align: center;
+            z-index: 10;
+            margin-bottom: 2rem;
+            will-change: transform, opacity;
+            animation: orchestrateEntry 1.4s var(--cue-reveal) forwards;
+        }
+
+        h1 {
+            font-size: clamp(2.5rem, 7vw, 4.5rem);
+            font-weight: 700;
+            letter-spacing: -0.5px;
+            color: var(--wine);
+            line-height: 1.1;
+            margin-bottom: 0.5rem;
+        }
+
+        .subtitle {
+            font-family: 'Dancing Script', cursive;
+            font-size: clamp(1.4rem, 4vw, 2.2rem);
+            color: var(--wine-light);
+            transform: rotate(-1.5deg);
+            display: inline-block;
+        }
+
+        /* ==========================================================================
+           MECÁNICA DEL SOBRE / CARTA INTERACTIVA
+           ========================================================================== */
+        .scenery {
+            z-index: 10;
+            position: relative;
+            width: clamp(300px, 85vw, 440px);
+            height: 280px;
+            will-change: transform, opacity;
+            opacity: 0;
+            animation: orchestrateEntry 1.4s var(--cue-reveal) 0.3s forwards;
+        }
+
+        .envelope-wrapper {
+            width: 100%;
+            height: 100%;
+            position: relative;
+            background-color: var(--wine);
+            border-radius: 4px;
+            box-shadow: 0 15px 45px rgba(38, 28, 28, 0.3);
+            cursor: pointer;
+            transform-style: preserve-3d;
+            transition: transform 0.4s var(--cue-reveal);
+        }
+
+        /* Micro-interacción física al posicionar el cursor */
+        .envelope-wrapper:hover {
+            transform: translateY(-8px) rotateX(5deg);
+        }
+
+        /* Solapa superior geométrica */
+        .flap {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 50%;
+            background-color: var(--wine);
+            clip-path: polygon(0 0, 100% 0, 50% 100%);
+            transform-origin: top center;
+            z-index: 4;
+            transition: transform 0.6s var(--cue-sheet), z-index 0.1s 0.3s;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.03);
+        }
+
+        /* Sello de lacre orgánico */
+        .wax-seal {
+            position: absolute;
+            bottom: -16px;
+            left: calc(50% - 22px);
+            width: 44px;
+            height: 44px;
+            background: radial-gradient(circle at 35% 35%, var(--wine-light) 0%, #300101 100%);
+            border-radius: 50%;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.4), inset 0 0 6px rgba(0,0,0,0.3);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: var(--gold);
+            font-family: 'Dancing Script', cursive;
+            font-size: 1.2rem;
+            font-weight: bold;
+            user-select: none;
+            transition: transform 0.4s var(--cue-bounce), opacity 0.3s;
+            z-index: 5;
+        }
+
+        .envelope-wrapper:hover .wax-seal {
+            transform: scale(1.08) rotate(5deg);
+        }
+
+        /* Laterales internos del sobre (Bolsillo físico) */
+        .pocket {
+            position: absolute;
+            inset: 0;
+            background-color: #380202;
+            clip-path: polygon(0 30%, 50% 65%, 100% 30%, 100% 100%, 0 100%);
+            z-index: 3;
+            border-top: 1px solid rgba(255, 255, 255, 0.04);
+            box-shadow: inset 0 10px 30px rgba(0,0,0,0.2);
+            border-radius: 0 0 4px 4px;
+        }
+
+        .pocket::after {
+            content: 'Ábreme';
+            position: absolute;
+            bottom: 2rem;
+            left: 0;
+            width: 100%;
+            text-align: center;
+            color: var(--gold);
+            font-family: 'Playfair Display', serif;
+            font-style: italic;
+            font-size: 0.9rem;
+            letter-spacing: 2px;
+            text-transform: uppercase;
+            opacity: 0.6;
+            transition: opacity 0.3s;
+        }
+
+        .envelope-wrapper:hover .pocket::after {
+            opacity: 0.9;
+        }
+
+        /* El Pergamino Interior (Papel Físico) */
+        .letter-sheet {
+            position: absolute;
+            bottom: 10px;
+            left: 4%;
+            width: 92%;
+            height: 85%;
+            background-color: var(--paper);
+            background-image: linear-gradient(rgba(197, 160, 89, 0.05) 1px, transparent 1px);
+            background-size: 100% 2rem;
+            padding: 2rem;
+            border-radius: 2px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.15);
+            z-index: 2;
+            transition: transform 0.7s var(--cue-sheet), opacity 0.5s, z-index 0s 0.3s;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            border: 1px solid rgba(197, 160, 89, 0.15);
+        }
+
+        .letter-sheet p {
+            font-family: 'Dancing Script', cursive;
+            font-size: clamp(1.2rem, 3.5vw, 1.5rem);
+            color: var(--ink);
+            text-align: center;
+            line-height: 1.6;
+            opacity: 0;
+            transform: translateY(15px);
+            transition: opacity 0.4s var(--cue-reveal), transform 0.4s var(--cue-reveal);
+        }
+
+        .letter-sheet strong {
+            color: var(--wine-light);
+            display: block;
+            margin-top: 0.8rem;
+            font-size: 1.25em;
+        }
+
+        /* ==========================================================================
+           TRANSFORMACIÓN DE ESTADO ABIERTO (MECÁNICA PREMIUM)
+           ========================================================================== */
+        .envelope-wrapper.is-deploying {
+            pointer-events: none; /* Bloquea spam clicks durante transición */
+        }
+
+        .envelope-wrapper.is-open {
+            transform: translateY(40px) rotateX(0deg);
+        }
+
+        .envelope-wrapper.is-open .flap {
+            transform: rotateX(180deg);
+            z-index: 1;
+        }
+
+        .envelope-wrapper.is-open .wax-seal {
+            opacity: 0;
+            transform: scale(0.5);
+        }
+
+        .envelope-wrapper.is-open .pocket::after {
+            opacity: 0;
+        }
+
+        .envelope-wrapper.is-open .letter-sheet {
+            z-index: 5;
+            transform: translateY(-135px) scale(1.05);
+            box-shadow: 0 20px 40px rgba(38, 28, 28, 0.2);
+        }
+
+        .envelope-wrapper.is-open .letter-sheet p {
+            opacity: 1;
+            transform: translateY(0);
+            transition-delay: 0.4s;
+        }
+
+        /* ==========================================================================
+           CONTROLES MECÁNICOS (AUDIO)
+           ========================================================================== */
+        .audio-engine {
+            position: fixed;
+            bottom: 2.5rem;
+            right: 2.5rem;
+            background: transparent;
+            color: var(--wine);
+            width: 48px;
+            height: 48px;
+            border-radius: 50%;
+            border: 1px solid rgba(66, 2, 2, 0.2);
+            cursor: pointer;
+            z-index: 100;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: background 0.4s var(--cue-reveal), color 0.4s var(--cue-reveal), transform 0.3s var(--cue-bounce), border-color 0.4s;
+            backdrop-filter: blur(8px);
+        }
+
+        .audio-engine:hover {
+            background: var(--wine);
+            color: var(--cream);
+            border-color: var(--wine);
+            transform: scale(1.08);
+        }
+
+        .audio-engine:active {
+            transform: scale(0.95);
+        }
+
+        .audio-engine:focus-visible {
+            outline: 2px solid var(--gold);
+            outline-offset: 3px;
+        }
+
+        .audio-engine svg {
+            width: 18px;
+            height: 18px;
+            fill: currentColor;
+            transition: transform 0.4s var(--cue-reveal);
+        }
+
+        /* ==========================================================================
+           ANIMACIONES CORE
+           ========================================================================== */
+        @keyframes orchestrateEntry {
+            from {
+                opacity: 0;
+                transform: translateY(30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <div class="vignette"></div>
+
+    <!-- Motor Gráfico de Partículas Avanzado (Atmósfera Orgánica) -->
+    <canvas id="ambient-canvas"></canvas>
+
+    <!-- UI Principal Semántica -->
+    <header>
+        <h1>Para mi Jessika</h1>
+        <p class="subtitle">1 año a tu lado, mi Peshosa.</p>
+    </header>
+
+    <main class="scenery">
+        <article
+            class="envelope-wrapper"
+            id="interactive-envelope"
+            role="button"
+            tabindex="0"
+            aria-label="Sobre antiguo interactivo. Presiona para leer la carta de aniversario."
+        >
+            <!-- Solapa Estructural -->
+            <div class="flap">
+                <div class="wax-seal">J&F</div>
+            </div>
+
+            <!-- Cuerpo Físico Frontal -->
+            <div class="pocket"></div>
+
+            <!-- Contenido Interno Desplegable -->
+            <div class="letter-sheet">
+                <p>
+                    Gracias por cada segundo, por tu paciencia y por este año increíble.
+                    <strong>Te amo.</strong>
+                </p>
+            </div>
+        </article>
+    </main>
+
+    <!-- Control de Audio Cinematográfico -->
+    <button class="audio-engine" id="audio-trigger" aria-label="Reproducir banda sonora ambiental">
+        <svg id="audio-icon" viewBox="0 0 24 24">
+            <!-- Icono de nota musical por defecto -->
+            <path d="M12 3v10.55c-.59-.34-1.27-.55-2-.55-2.21 0-4 1.79-4 4s1.79 4 4 4 4-1.79 4-4V7h4V3h-6z"/>
+        </svg>
+    </button>
+
+    <!-- API de Audio Nativa integrada -->
+    <audio id="soundtrack" loop preload="auto">
+        <source src="https://www.soundhelix.com/examples/mp3/SoundHelix-Song-1.mp3" type="audio/mpeg">
+    </audio>
+
+    <!-- ==========================================================================
+         LÓGICA INTERACTIVA Y RENDERIZADO DE PARTÍCULAS (ES6+)
+         ========================================================================== */ -->
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+
+            /* --- Gestión Mecánica de la Carta --- */
+            const envelope = document.getElementById('interactive-envelope');
+
+            const handleEnvelopeDeployment = () => {
+                if (envelope.classList.contains('is-deploying')) return;
+
+                envelope.classList.add('is-deploying');
+                envelope.classList.toggle('is-open');
+
+                // Remoción del bloqueo de interacción tras el fin de la animación física
+                setTimeout(() => {
+                    envelope.classList.remove('is-deploying');
+                }, 700);
+            };
+
+            envelope.addEventListener('click', handleEnvelopeDeployment);
+            envelope.addEventListener('keydown', (e) => {
+                if (e.key === 'Enter' || e.key === ' ') {
+                    e.preventDefault();
+                    handleEnvelopeDeployment();
+                }
+            });
+
+
+            /* --- Módulo de Audio Resiliente --- */
+            const audioTrigger = document.getElementById('audio-trigger');
+            const audioIcon = document.getElementById('audio-icon');
+            const soundtrack = document.getElementById('soundtrack');
+            let audioState = false;
+
+            soundtrack.volume = 0.4; // Nivel de fondo sutil para no competir con la intimidad visual
+
+            audioTrigger.addEventListener('click', () => {
+                audioState = !audioState;
+                if (audioState) {
+                    soundtrack.play();
+                    // Mutación semántica a icono de pausa
+                    audioIcon.innerHTML = `<path d="M6 19h4V5H6v14zm8-14v14h4V5h-4z"/>`;
+                    audioTrigger.style.background = 'var(--wine)';
+                    audioTrigger.style.color = 'var(--cream)';
+                } else {
+                    soundtrack.pause();
+                    // Retorno a icono de nota musical
+                    audioIcon.innerHTML = `<path d="M12 3v10.55c-.59-.34-1.27-.55-2-.55-2.21 0-4 1.79-4 4s1.79 4 4 4 4-1.79 4-4V7h4V3h-6z"/>`;
+                    audioTrigger.style.background = 'transparent';
+                    audioTrigger.style.color = 'var(--wine)';
+                }
+            });
+
+
+            /* --- Motor de Simulación Ambiental (Canvas 2D) --- */
+            const canvas = document.getElementById('ambient-canvas');
+            const ctx = canvas.getContext('2d');
+            let universalParticles = [];
+
+            const resizeCanvasSpace = () => {
+                canvas.width = window.innerWidth;
+                canvas.height = window.innerHeight;
+            };
+            window.addEventListener('resize', resizeCanvasSpace);
+            resizeCanvasSpace();
+
+            class FluidParticle {
+                constructor() {
+                    this.reset();
+                    // Distribución inicial aleatoria en toda la pantalla en el primer ciclo
+                    this.y = Math.random() * canvas.height;
+                }
+
+                reset() {
+                    this.x = Math.random() * canvas.width;
+                    this.y = canvas.height + 20;
+                    this.radius = Math.random() * 2.5 + 1;
+                    this.speedY = Math.random() * 0.6 + 0.2;
+                    this.speedX = (Math.random() - 0.5) * 0.3;
+                    this.opacity = Math.random() * 0.4 + 0.1;
+                    this.nature = Math.random() > 0.85 ? 'heart' : 'ember';
+                    this.angleSpeed = Math.random() * 0.02;
+                    this.angle = Math.random() * Math.PI;
+                }
+
+                update() {
+                    this.y -= this.speedY;
+                    this.x += this.speedX + Math.sin(this.angle) * 0.2;
+                    this.angle += this.angleSpeed;
+
+                    // Extinción física al superar el límite superior
+                    if (this.y < -10 || this.opacity <= 0) {
+                        this.reset();
+                    }
+                }
+
+                draw() {
+                    ctx.save();
+                    ctx.globalAlpha = this.opacity;
+                    ctx.translate(this.x, this.y);
+
+                    if (this.nature === 'heart') {
+                        ctx.fillStyle = 'rgba(125, 18, 18, 0.75)'; // Tonalidad wine-light controlada
+                        ctx.beginPath();
+                        const scale = this.radius * 1.2;
+                        ctx.moveTo(0, 0);
+                        ctx.bezierCurveTo(-scale / 2, -scale / 2, -scale, scale / 3, 0, scale);
+                        ctx.bezierCurveTo(scale, scale / 3, scale / 2, -scale / 2, 0, 0);
+                        ctx.fill();
+                    } else {
+                        // Polvo dorado en suspensión lumínica
+                        ctx.fillStyle = 'rgba(197, 160, 89, 0.5)';
+                        ctx.beginPath();
+                        ctx.arc(0, 0, this.radius, 0, Math.PI * 2);
+                        ctx.fill();
+                    }
+                    ctx.restore();
+                }
+            }
+
+            // Inicialización adaptativa del pool de partículas según densidad gráfica de la pantalla
+            const computeOptimalDensity = () => window.innerWidth < 768 ? 35 : 75;
+            const density = computeOptimalDensity();
+
+            for (let i = 0; i < density; i++) {
+                universalParticles.push(new FluidParticle());
+            }
+
+            /* Bucle de renderizado a 60fps usando hardware acelerado */
+            const renderLoop = () => {
+                ctx.clearRect(0, 0, canvas.width, canvas.height);
+                for (let i = 0; i < universalParticles.length; i++) {
+                    universalParticles[i].update();
+                    universalParticles[i].draw();
+                }
+                requestAnimationFrame(renderLoop);
+            };
+            renderLoop();
+        });
+    </script>
+</body>
+</html>
